@@ -19,13 +19,14 @@ Node::Node(int val) {
 class SortedLinkedList {
 private:
     Node* head;
-    void merge(int arr[],int rightHalf[], int leftHalf[]);
+    void merge(int arr[],int rightHalf[],int rightSize, int leftHalf[],int leftSize);
+    void mergesort(int arr[],int Size);
 public:
     SortedLinkedList();
     // Main function
     void insert(int value);
     void remove(int index);
-    void mergesort(int arr[]);
+    int countNodes();
     // Operator overloading
     friend ostream& operator<<(ostream&os, const SortedLinkedList& list);
     int operator[](int index);
@@ -47,9 +48,24 @@ void SortedLinkedList::insert(int value) {
         current = current->next;
     }
 
-    Node* newNode = new Node(value);
-    newNode->next = current->next;
-    current->next = newNode;
+    current->next = new Node(value);
+
+    int n = countNodes();
+    int arr[n];
+
+    Node *temp = head;
+    for (int i = 0; i < n; i++) {
+        arr[i] = temp->data;
+        temp = temp->next;
+    }
+
+    mergesort(arr,n);
+
+    temp = head;
+    for (int i = 0; i < n; i++) {
+        temp->data = arr[i];
+        temp = temp->next;
+    }
 }
 
 void SortedLinkedList::remove(int index) {
@@ -96,12 +112,19 @@ ostream& operator<<(ostream&os, const SortedLinkedList& list) {
 
 
 
+int SortedLinkedList::countNodes() {
+    int nodes = 0;
+    Node* current = head;
+    while (current != nullptr) {
+        nodes++;
+        current = current->next;
+    }
+
+    return nodes;
+}
 
 
-void SortedLinkedList::merge(int arr[],int rightHalf[], int leftHalf[]) {
-    int leftSize = sizeof(leftHalf) / rightHalf[0];
-    int rightSize = sizeof(rightHalf) / leftHalf[0];
-
+void SortedLinkedList::merge(int arr[],int rightHalf[],int rightSize, int leftHalf[],int leftSize) {
     int i = 0, j = 0, k = 0;
 
     while (i < leftSize && j < rightSize) {
@@ -121,15 +144,15 @@ void SortedLinkedList::merge(int arr[],int rightHalf[], int leftHalf[]) {
         k++;
     }
     while (j < rightSize) {
-        arr[k] = rightHalf[i];
+        arr[k] = rightHalf[j];
         j++;
         k++;
     }
 
 }
 
-void SortedLinkedList::mergesort(int arr[]) {
-    int length = sizeof(arr)/arr[0];
+void SortedLinkedList::mergesort(int arr[],int Size) {
+    int length = Size;
 
     if (length < 2) {
         return;
@@ -145,11 +168,36 @@ void SortedLinkedList::mergesort(int arr[]) {
     for (int i = midIdx; i < length; i++) {
         rightHalf[i - midIdx] = arr[i];
     }
-
-    mergesort(leftHalf);
-    mergesort(rightHalf);
-    merge(arr, rightHalf,leftHalf);
+    int rightSize = sizeof(rightHalf) / sizeof(rightHalf[0]);
+    int leftSize = sizeof(leftHalf) / sizeof(leftHalf[0]);
+    mergesort(leftHalf,leftSize);
+    mergesort(rightHalf,rightSize);
+    merge(arr, rightHalf,rightSize,leftHalf,leftSize);
 }
+
+
+
+int SortedLinkedList::operator[](int index) {
+    if (index < 0) {
+        cerr << "Index out of bounds" << endl;
+        return -1; // Or throw an exception
+    }
+
+    Node* current = head;
+    int count = 0;
+
+    while (current != nullptr) {
+        if (count == index) {
+            return current->data;
+        }
+        current = current->next;
+        count++;
+    }
+
+    cerr << "Index out of bounds" << endl;
+    return -1; // Or throw an exception
+}
+
 
 SortedLinkedList::~SortedLinkedList() {
     while (head != nullptr) {
