@@ -83,7 +83,7 @@ void SortedLinkedList::remove(int index) {
 
     // Delete any position out of head and tail
     Node* current = head;
-    for (int i = 1; i <= index && current != nullptr; i++) {
+    for (int i = 0; i < index - 1 && current != nullptr; i++) {
         current = current->next;
     }
 
@@ -180,13 +180,12 @@ void SortedLinkedList::mergesort(int arr[],int Size) {
 int SortedLinkedList::operator[](int index) {
     if (index < 0) {
         cerr << "Index out of bounds" << endl;
-        return -1; // Or throw an exception
+        return -1;
     }
 
     Node* current = head;
     int count = 0;
-
-    while (current != nullptr) {
+    while (current) {
         if (count == index) {
             return current->data;
         }
@@ -195,9 +194,8 @@ int SortedLinkedList::operator[](int index) {
     }
 
     cerr << "Index out of bounds" << endl;
-    return -1; // Or throw an exception
+    return -1;
 }
-
 
 SortedLinkedList::~SortedLinkedList() {
     while (head != nullptr) {
